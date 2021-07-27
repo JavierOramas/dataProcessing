@@ -7,6 +7,11 @@ import json
 
 risen_supervisors = pd.DataFrame([])
 
+RBTs = []
+trainees = []
+risen_supervisors = []
+supervisors = []
+
 def get_providers():
     return pd.read_csv('providers.csv', sep=',')
 
@@ -16,11 +21,16 @@ def get_data():
     return df.drop(df.columns.difference(labels), 1)
 
 def verify_valid_overlapping(entry, i, providerName, procedureCode, providerId ,risen_supervisors):
-    
+    # if entry[providerName] == 'Maggy' and i[providerName] == 'Rahimil':
     procedure = entry[procedureCode]
     if entry[providerId] == i[providerId]:
         return False
-    if procedure.lower().replace(' ', '') in ['97155'] and i[procedureCode].lower().replace(' ', '') in ['remoteindividualsupervision', '97155:non-billable']:
+    if entry[providerId] in RBTs and i[providerId] in trainees:
+        return False
+    
+    # if (entry[providerId] in RBTs or entry[providerId] in trainees) and i[providerId] in risen_supervisors:
+        
+    if procedure.lower().replace(' ', '') in ['97155'] and i[procedureCode].lower().replace(' ', '') in ['97155:non-billable']:
         return True
     if procedure.lower().replace(' ', '') in ['97153', '97153:non-billable'] and i[procedureCode].lower().replace(' ', '') in ['97155', '97155:non-billable']:
         return True
@@ -36,6 +46,7 @@ def calculate_overlapping(entry, providerName,providerId,depured_data, procedure
     procedure = entry[procedureCode]
     
     for i in depured_data:
+        # print(verify_valid_overlapping(entry,i,providerName,procedureCode,providerId, risen_supervisors))
         if  verify_valid_overlapping(entry,i,providerName,procedureCode,providerId, risen_supervisors):
             start = datetime.strptime(i[timeFrom], '%m/%d/%Y %H:%M')
             end = datetime.strptime(i[timeTo], '%m/%d/%Y %H:%M')
@@ -59,7 +70,7 @@ def process(fix=False):
     data = get_data()
     
     valid = ['97153', '97155', '97153: Non-Billable', '97155: Non-Billable', 'Documentation', 'Remote Individual Supervision']
-    supervisors_codes = ['97155', '97155:non-billeable', 'remoteindividualsupervision']
+    supervisors_codes = ['97155', '97155:non-billable', 'remoteindividualsupervision']
     valid = [i.replace(' ','').lower() for i in valid]
     
     # eliminar datos no deseados
@@ -68,17 +79,13 @@ def process(fix=False):
     data = data[data.Filter1]
     data = data.drop('Filter1', 1)  
     
-    #datos de los
-    filter_supervisors =[i.replace(' ', '').lower() in supervisors_codes for i in data.ProcedureCode]
-    supervisors_data = data[filter_supervisors]
-    
     errors = []
     notifications = []
     depured_data = []
     non_supervisors = []
     providersErrors = []
 
-    cols = supervisors_data.columns
+    cols = data.columns
 
     providerId = list(cols).index('ProviderId')
     providerName = list(cols).index('ProviderFirstName')
@@ -86,6 +93,20 @@ def process(fix=False):
     timeFrom = list(cols).index('TimeWorkedFrom')
     timeTo = list(cols).index('TimeWorkedTo')
     client = list(cols).index('ClientFirstName')
+    # print(data[data['ProviderFirstName'] == 'Rahimil'])
+    
+    # test = np.array(data)
+    # #datos de los
+    # for i in test:
+    #     # print(i)
+    #     if i[providerName] == 'Rahimil':
+    #         print(i[procedureCode].lower().replace(' ', '') in supervisors_codes)
+    #         print(i[procedureCode].lower().replace(' ', '') )
+    #         print()
+    filter_supervisors =[i.replace(' ', '').lower() in supervisors_codes for i in data.ProcedureCode]
+    
+    supervisors_data = data[filter_supervisors]
+    # print(supervisors_data[supervisors_data['ProviderFirstName'] == 'Rahimil'])
 
     supervisors_data = np.array(supervisors_data)
 
@@ -106,7 +127,7 @@ def process(fix=False):
         if i[procedureCode] == '97155':
             if i[providerId] in list(risen_supervisors['ProviderId']+supervisors['ProviderId']) :
                 notifications.append(i)
-                i[procedureCode] = '97155:non-billeable'
+                i[procedureCode] = '97155:non-billable'
                 depured_data.append(i)
                 continue
                 
@@ -114,8 +135,8 @@ def process(fix=False):
                 errors.append(i)
                 providersErrors.append(i[providerId])
                 continue
-            
-        if i[procedureCode].replace(' ', '').lower() == '97155:non-billeable':
+
+        if i[procedureCode].replace(' ', '').lower() == '97155:non-billable':
             if i[providerId] in list(trainees['ProviderId']):
                 errors.append(i)
                 providersErrors.append(i[providerId])
@@ -153,7 +174,7 @@ def process(fix=False):
             if i[providerId] in list(risen_supervisors['ProviderId']):
                 # errors.append(i)
                 # providersErrors.append(i[providerId])
-                i[procedureCode] = '97155:non-billeable'
+                i[procedureCode] = '97155:non-billable'
                 continue
             non_supervisors.append(i)
 
@@ -185,28 +206,34 @@ def process(fix=False):
     
         new_ol = calculate_overlapping(i, providerName=providerName, providerId=providerId, depured_data=depured_data, procedureCode=procedureCode, 
                                        client=client, timeFrom=timeFrom, timeTo=timeTo, risen_supervisors=risen_supervisors)
+        
+        # print(new_ol)
         if i[providerId] in providersErrors:
+            
             if not i[providerId] in providers_data_with_errors:
-                overlappings[i[providerId]] = []
+                providers_data_with_errors[i[providerId]] = []
 
             providers_data_with_errors[i[providerId]].append(new_ol) 
-            continue
         
-        if not i[providerId] in overlappings:
-            overlappings[i[providerId]] = []
-            # overlappings[i[providerId]]
-            
-        if len(new_ol) != 0:
-            overlappings[i[providerId]].append(new_ol) 
+        else:
+            if not i[providerId] in overlappings:
+                overlappings[i[providerId]] = []
+                # overlappings[i[providerId]]
+
+            if len(new_ol) != 0:
+                overlappings[i[providerId]].append(new_ol) 
 
     
     notifications = pd.DataFrame(np.stack(notifications, axis=0), columns=cols)
     
     if len(errors) > 0:
-        with open('overlapping_missing_errors.json', 'w') as f:
-            f.write(json.dumps(providers_data_with_errors))
-        with open('supervisors_data.json', 'w') as f:
-            f.write(json.dumps(supervisors_data))
+        
+        # # with open('overlapping_missing_errors.json', 'w') as f:
+        # #     f.write(json.dumps(for i in providers_data_with_errors))
+        
+        # for i in providers_data_with_errors:
+            
+        pd.DataFrame(supervisors_data).to_csv('supervisors_data.csv')
     if len(notifications) > 0:
         with open('auto_fixed_errors.json', 'w') as f:
             notifications.to_csv('auto_fixed.csv')
@@ -214,7 +241,7 @@ def process(fix=False):
 
     lab = list(cols)
     lab.append('MeetingDuration')
-
+    # print(overlappings)
     for i in overlappings:
         ol = []
         for j in overlappings[i]:
