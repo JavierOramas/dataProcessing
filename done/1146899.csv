@@ -1,6 +1,6 @@
 ,DateOfService,TimeWorkedFrom,TimeWorkedTo,TimeWorkedInHours,ClientFirstName,ProviderFirstName,ProviderId,ProcedureCode,MeetingDuration
-0,6/14/2021 0:00,6/14/2021 20:00,6/14/2021 21:00,1.0,SM,Yarelis,1128037,Remote Individual Supervision ,0 days 01:00:00.000000000
-1,6/21/2021 0:00,6/21/2021 20:00,6/21/2021 21:00,1.0,SM,Yarelis,1128037,Remote Individual Supervision ,0 days 01:00:00.000000000
-2,6/28/2021 0:00,6/28/2021 20:00,6/28/2021 21:00,1.0,SM,Yarelis,1128037,Remote Individual Supervision ,0 days 01:00:00.000000000
-3,6/18/2021 0:00,6/18/2021 9:00,6/18/2021 11:00,2.0,SM,Yarelis,1128037,97155,0 days 02:00:00.000000000
-4,6/25/2021 0:00,6/25/2021 9:00,6/25/2021 11:00,2.0,SM,Yarelis,1128037,97155,0 days 02:00:00.000000000
+0,6/14/2021 0:00,6/14/2021 20:00,6/14/2021 21:00,1.0,SM,Yarelis,1128037,Remote Individual Supervision ,1.0
+1,6/21/2021 0:00,6/21/2021 20:00,6/21/2021 21:00,1.0,SM,Yarelis,1128037,Remote Individual Supervision ,1.0
+2,6/28/2021 0:00,6/28/2021 20:00,6/28/2021 21:00,1.0,SM,Yarelis,1128037,Remote Individual Supervision ,1.0
+3,6/18/2021 0:00,6/18/2021 9:00,6/18/2021 11:00,2.0,SM,Yarelis,1128037,97155,2.0
+4,6/25/2021 0:00,6/25/2021 9:00,6/25/2021 11:00,2.0,SM,Yarelis,1128037,97155,2.0
