@@ -4,7 +4,10 @@ from tools import process
 
 code = ''
 
-uploaded_file = st.file_uploader("Upload csv")
+st.title("Data Processor")
+st.write("""puede añadir un nuevo csv usando el componente siguiente, no obstante si ya el csv se encuentra cargado (de previas ejecuciones o agregado manualmente) puede directamente ejecutar el programa tocando el boton""")
+
+uploaded_file = st.file_uploader(" ")
 if uploaded_file is not None:
     stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
     string_data = stringio.read()
@@ -13,8 +16,9 @@ if uploaded_file is not None:
     
 if st.button('Comenzar procesamiento'):
     code = process()
-if code == 'error':
-    st.danger('hubo errores')
+    # print(code)
+if code == 'errors':
+    st.error('hubo errores, revisar archivo errors.csv')
 elif code == 'notifications':
     st.info('se corrigieron automaticamente algunos errores')
 elif code != '':

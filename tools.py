@@ -71,7 +71,6 @@ def process(fix=False):
     risen_supervisors = providers_data[providers_data['Type'] == 'Risen Supervisor']
     trainees = providers_data[providers_data['Status'] == 'Trainee']
     RBTs = providers_data[providers_data['Status'] == 'RBT']
-
     data = get_data()
     
     valid = ['97153', '97155', '97153: Non-Billable', '97155: Non-Billable', 'Documentation', 'Remote Individual Supervision']
@@ -174,7 +173,6 @@ def process(fix=False):
             non_supervisors.append(i)
 
     for i in code53:
-    
         if i[providerId] in list(supervisors['ProviderId']):
             errors.append(i)
             providersErrors.append(i[providerId])
@@ -197,16 +195,16 @@ def process(fix=False):
 
     overlappings = {}
     providers_data_with_errors = {}
-    
+        
     for i in non_supervisors:
     
         new_ol = calculate_overlapping(i, providerName=providerName, providerId=providerId, depured_data=depured_data, procedureCode=procedureCode, 
                                        client=client, timeFrom=timeFrom, timeTo=timeTo, risen_supervisors=risen_supervisors)
-        print(i)
-        print(new_ol)
-        print()
+        # print(i)
+        # print(new_ol)
+        # print()
         if i[providerId] in providersErrors:
-            pritn('here')
+            # print('here')
             if not i[providerId] in providers_data_with_errors:
                 providers_data_with_errors[i[providerId]] = []
 
@@ -217,20 +215,15 @@ def process(fix=False):
                 overlappings[i[providerId]] = []
                 # overlappings[i[providerId]]
 
-            print(i)
+            # print(i)
             if len(new_ol) != 0:
                 overlappings[i[providerId]].append(new_ol) 
 
     
     notifications = pd.DataFrame(np.stack(notifications, axis=0), columns=cols)
     
-    if len(errors) > 0:
-        
-        # # with open('overlapping_missing_errors.json', 'w') as f:
-        # #     f.write(json.dumps(for i in providers_data_with_errors))
-        
-        # for i in providers_data_with_errors:
-            
+    if len(errors) > 0:  
+        pd.DataFrame(errors).to_csv('errors.csv')
         pd.DataFrame(supervisors_data).to_csv('supervisors_data.csv')
     if len(notifications) > 0:
         notifications.to_csv('auto_fixed.csv')
