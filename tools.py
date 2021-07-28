@@ -197,8 +197,9 @@ def process(fix=False):
             
         non_supervisors.append(i)
         
+    
     if len(non_supervisors) > 0:
-        doc_depured = np.stack(non_supervisors, axis=0)
+        non_supervisors = np.stack(non_supervisors, axis=0)
     if len(depured_data) > 0:    
         depured_data = np.stack(depured_data, axis=0)
     if len(errors) > 0:
@@ -262,3 +263,7 @@ def process(fix=False):
     if len(notifications):
         return 'notifications'
     return 'ok'
+
+
+if __name__ == '__main__':
+    process()
