@@ -4,6 +4,7 @@ from os import path
 from datetime import datetime
 import streamlit as st 
 import json
+import os
 
 risen_supervisors = pd.DataFrame([])
 
@@ -200,11 +201,9 @@ def process(fix=False):
     
         new_ol = calculate_overlapping(i, providerName=providerName, providerId=providerId, depured_data=depured_data, procedureCode=procedureCode, 
                                        client=client, timeFrom=timeFrom, timeTo=timeTo, risen_supervisors=risen_supervisors)
-        # print(i)
-        # print(new_ol)
-        # print()
+        
         if i[providerId] in providersErrors:
-            # print('here')
+
             if not i[providerId] in providers_data_with_errors:
                 providers_data_with_errors[i[providerId]] = []
 
@@ -213,9 +212,7 @@ def process(fix=False):
         else:
             if not i[providerId] in overlappings:
                 overlappings[i[providerId]] = []
-                # overlappings[i[providerId]]
 
-            # print(i)
             if len(new_ol) != 0:
                 overlappings[i[providerId]].append(new_ol) 
 
@@ -232,6 +229,10 @@ def process(fix=False):
     lab = list(cols)
     lab.append('MeetingDuration')
     # print(overlappings)
+    
+    if not os.path.exists('done'):
+        os.mkdir('done')
+        
     for i in overlappings:
         ol = []
         for j in overlappings[i]:
