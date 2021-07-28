@@ -20,7 +20,7 @@ def get_data():
     labels = ['ProviderId', 'DateOfService', 'TimeWorkedFrom', 'TimeWorkedTo', 'TimeWorkedInHours', 'ClientFirstName', 'ProviderFirstName', 'ProcedureCode' ]
     return df.drop(df.columns.difference(labels), 1)
 
-def verify_valid_overlapping(entry, i, providerName, procedureCode, providerId ,risen_supervisors):
+def verify_valid_overlapping(entry, i, providerName, procedureCode, providerId):
     # if entry[providerName] == 'Maggy' and i[providerName] == 'Rahimil':
     procedure = entry[procedureCode]
     if entry[providerId] == i[providerId]:
@@ -47,7 +47,7 @@ def calculate_overlapping(entry, providerName,providerId,depured_data, procedure
     
     for i in depured_data:
         # print(verify_valid_overlapping(entry,i,providerName,procedureCode,providerId, risen_supervisors))
-        if  verify_valid_overlapping(entry,i,providerName,procedureCode,providerId, risen_supervisors):
+        if  verify_valid_overlapping(entry,i,providerName,procedureCode,providerId):
             start = datetime.strptime(i[timeFrom], '%m/%d/%Y %H:%M')
             end = datetime.strptime(i[timeTo], '%m/%d/%Y %H:%M')
             if not i[client] == entry[client]:
@@ -56,7 +56,12 @@ def calculate_overlapping(entry, providerName,providerId,depured_data, procedure
             if (entry_start >= start and entry_start <= end) or (entry_end >= start and entry_end <= end) or (start >= entry_start and end <= entry_end):
                 time = min(entry_end,end)-max(entry_start, start)
                 overlapping.append((entry,i, time))
-                
+    
+    if len(overlapping) > 1:
+        for i in overlapping:
+            if i[1][procedureCode].lower().replace(' ', '') == '97155:non-billable':
+                overlapping = [i]
+                break
     return overlapping
 
 def process(fix=False):    
