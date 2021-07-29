@@ -24,6 +24,7 @@ def get_data():
 def verify_valid_overlapping(entry, i, providerName, procedureCode, providerId):
     # if entry[providerName] == 'Maggy' and i[providerName] == 'Rahimil':
     procedure = entry[procedureCode]
+    id = entry[providerId]
     if entry[providerId] == i[providerId]:
         return False
     if entry[providerId] in RBTs and i[providerId] in trainees:
@@ -31,7 +32,7 @@ def verify_valid_overlapping(entry, i, providerName, procedureCode, providerId):
     
     # if (entry[providerId] in RBTs or entry[providerId] in trainees) and i[providerId] in risen_supervisors:
         
-    if procedure.lower().replace(' ', '') in ['97155'] and i[procedureCode].lower().replace(' ', '') in ['97155:non-billable']:
+    if procedure.lower().replace(' ', '') in ['97155', '97155:non-billable'] and i[procedureCode].lower().replace(' ', '') in ['97155', '97155:non-billable']:
         return True
     if procedure.lower().replace(' ', '') in ['97153', '97153:non-billable'] and i[procedureCode].lower().replace(' ', '') in ['97155', '97155:non-billable']:
         return True
@@ -59,10 +60,18 @@ def calculate_overlapping(entry, providerName,providerId,depured_data, procedure
                 overlapping.append((entry,i, time))
     
     if len(overlapping) > 1:
+        new_overlapping = ''
         for i in overlapping:
-            if i[1][procedureCode].lower().replace(' ', '') == '97155:non-billable':
+            if i[1][providerId] in risen_supervisors:
                 overlapping = [i]
                 break
+            if i[1][providerId] in supervisors:
+                new_overlapping = [i]
+            if new_overlapping == '' and i[1][providerId] in trainees:
+                new_overlapping = [i]
+        if new_overlapping != '':
+            overlapping == new_overlapping
+            
     return overlapping
 
 def process(fix=False):    
@@ -132,11 +141,11 @@ def process(fix=False):
                 continue
 
         if i[procedureCode].replace(' ', '').lower() == '97155:non-billable':
-            if i[providerId] in list(trainees['ProviderId']):
-                errors.append(i)
-                providersErrors.append(i[providerId])
-                continue
-            elif i[providerId] in list(RBTs['ProviderId']):
+            # if i[providerId] in list(trainees['ProviderId']):
+                # errors.append(i)
+                # providersErrors.append(i[providerId])
+                # continue
+            if i[providerId] in list(RBTs['ProviderId']):
                 errors.append(i)
                 providersErrors.append(i[providerId])
                 continue
@@ -145,7 +154,7 @@ def process(fix=False):
 
     code53 = np.array(data[[i.lower().replace(' ', '') == '97153' for i in data['ProcedureCode']]])
     code_doc = np.array(data[[i.lower().replace(' ', '') == 'documentation' for i in data['ProcedureCode']]])
-    code55 = np.array(data[[i.lower().replace(' ', '') == '97155' for i in data['ProcedureCode']]])
+    code55 = np.array(data[[i.lower().replace(' ', '') in ['97155', '97155:non-billable'] for i in data['ProcedureCode']]])
     
     for i in code_doc:
         if i[procedureCode].replace(' ', '').lower() == 'documentation':
@@ -165,13 +174,14 @@ def process(fix=False):
         non_supervisors.append(i)
     
     for i in code55:
-        if i[procedureCode].replace(' ', '').lower() == '97155':
-            if i[providerId] in list(risen_supervisors['ProviderId']):
-                # errors.append(i)
-                # providersErrors.append(i[providerId])
-                i[procedureCode] = '97155:non-billable'
-                continue
-            non_supervisors.append(i)
+        # if i[procedureCode].replace(' ', '').lower() == '97155':
+        if i[providerId] in list(risen_supervisors['ProviderId']):
+            # errors.append(i)
+            # providersErrors.append(i[providerId])
+            # i[procedureCode] = '97155:non-billable'
+            depured_data.append(i)
+            continue
+        non_supervisors.append(i)
 
     for i in code53:
         if i[providerId] in list(supervisors['ProviderId']):
