@@ -12,6 +12,8 @@ RBTs = []
 trainees = []
 risen_supervisors = []
 supervisors = []
+providersErrors = []
+
 
 def get_providers():
     return pd.read_csv('providers.csv', sep=',')
@@ -45,7 +47,6 @@ def calculate_overlapping(entry, providerName,providerId,depured_data, procedure
     
     entry_start = datetime.strptime(entry[timeFrom], '%m/%d/%Y %H:%M')
     entry_end = datetime.strptime(entry[timeTo], '%m/%d/%Y %H:%M')
-    procedure = entry[procedureCode]
     
     for i in depured_data:
         # print(verify_valid_overlapping(entry,i,providerName,procedureCode,providerId, risen_supervisors))
@@ -71,6 +72,8 @@ def calculate_overlapping(entry, providerName,providerId,depured_data, procedure
                 new_overlapping = [i]
         if new_overlapping != '':
             overlapping == new_overlapping
+    elif overlapping[0][1][procedureCode].lower().replace(' ', '') == '97153:non-billable':
+        providersErrors.append(overlapping[0][1][providerId])
             
     return overlapping
 
@@ -97,7 +100,6 @@ def process(fix=False):
     notifications = []
     depured_data = []
     non_supervisors = []
-    providersErrors = []
 
     cols = data.columns
 
@@ -227,12 +229,12 @@ def process(fix=False):
                 overlappings[i[providerId]].append(new_ol) 
 
     
-    notifications = pd.DataFrame(np.stack(notifications, axis=0), columns=cols)
     
     if len(errors) > 0:  
         pd.DataFrame(errors).to_csv('errors.csv')
         pd.DataFrame(supervisors_data).to_csv('supervisors_data.csv')
     if len(notifications) > 0:
+        notifications = pd.DataFrame(np.stack(notifications, axis=0), columns=cols)
         notifications.to_csv('auto_fixed.csv')
 
 
