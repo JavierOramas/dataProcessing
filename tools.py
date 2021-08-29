@@ -60,6 +60,8 @@ def calculate_overlapping(entry, providerName,providerId,depured_data, procedure
                 time = min(entry_end,end)-max(entry_start, start)
                 overlapping.append((entry,i, time))
     
+    if len(overlapping) == 0:
+        return []
     if len(overlapping) > 1:
         new_overlapping = ''
         for i in overlapping:
@@ -74,7 +76,7 @@ def calculate_overlapping(entry, providerName,providerId,depured_data, procedure
             overlapping == new_overlapping
     elif overlapping[0][1][procedureCode].lower().replace(' ', '') == '97153:non-billable':
         providersErrors.append(overlapping[0][1][providerId])
-            
+
     return overlapping
 
 def process(fix=False):    
