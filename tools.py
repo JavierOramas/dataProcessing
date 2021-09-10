@@ -20,7 +20,7 @@ def get_providers():
 
 def get_data():
     df = pd.read_csv('data.csv')
-    labels = ['ProviderId', 'DateOfService', 'TimeWorkedFrom', 'TimeWorkedTo', 'TimeWorkedInHours', 'ClientFirstName', 'ProviderFirstName', 'ProcedureCode' ]
+    labels = ['ProviderId', 'DateOfService', 'TimeWorkedFrom', 'TimeWorkedTo', 'TimeWorkedInHours', 'ClientFirstName', 'ProviderFirstName', 'ProcedureCode', 'ClientId']
     return df.drop(df.columns.difference(labels), 1)
     
 def verify_valid_overlapping(entry, i, providerName, procedureCode, providerId):
@@ -111,7 +111,8 @@ def process(fix=False):
     procedureCode = list(cols).index('ProcedureCode')
     timeFrom = list(cols).index('TimeWorkedFrom')
     timeTo = list(cols).index('TimeWorkedTo')
-    client = list(cols).index('ClientFirstName')
+    client = list(cols).index('ClientId')
+    clientName = list(cols).index('ClientFirstName')
 
     filter_supervisors =[i.replace(' ', '').lower() in supervisors_codes for i in data.ProcedureCode]
     
