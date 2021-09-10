@@ -58,7 +58,8 @@ def calculate_overlapping(entry, providerName,providerId,depured_data, procedure
             
             if (entry_start >= start and entry_start <= end) or (entry_end >= start and entry_end <= end) or (start >= entry_start and end <= entry_end):
                 time = min(entry_end,end)-max(entry_start, start)
-                overlapping.append((entry,i, time))
+                if time != 0:
+                    overlapping.append((entry,i, time))
     
     if len(overlapping) == 0:
         return []
