@@ -14,9 +14,10 @@ risen_supervisors = []
 supervisors = []
 providersErrors = []
 
-
 def get_providers():
     return pd.read_csv('providers.csv', sep=',')
+
+providers_data = get_providers()
 
 def get_data():
     df = pd.read_csv('data.csv')
@@ -24,7 +25,6 @@ def get_data():
     return df.drop(df.columns.difference(labels), 1)
     
 def verify_valid_overlapping(entry, i, providerName, procedureCode, providerId):
-    # if entry[providerName] == 'Maggy' and i[providerName] == 'Rahimil':
     procedure = entry[procedureCode]
     id = entry[providerId]
     if entry[providerId] == i[providerId]:
@@ -32,7 +32,6 @@ def verify_valid_overlapping(entry, i, providerName, procedureCode, providerId):
     if entry[providerId] in RBTs and i[providerId] in trainees:
         return False
     
-    # if (entry[providerId] in RBTs or entry[providerId] in trainees) and i[providerId] in risen_supervisors:
         
     if procedure.lower().replace(' ', '') in ['97155', '97155:non-billable'] and i[procedureCode].lower().replace(' ', '') in ['97155', '97155:non-billable']:
         return True
@@ -81,7 +80,6 @@ def calculate_overlapping(entry, providerName,providerId,depured_data, procedure
     return overlapping
 
 def process(fix=False):    
-    providers_data = get_providers()
     
     supervisors = providers_data[providers_data['Type'] == 'Supervisor']
     risen_supervisors = providers_data[providers_data['Type'] == 'Risen Supervisor']
@@ -244,7 +242,6 @@ def process(fix=False):
 
     lab = list(cols)
     lab.append('MeetingDuration')
-    print(cols)
     # print(overlappings)
     
     if not os.path.exists('done'):
@@ -260,7 +257,8 @@ def process(fix=False):
             ol.append(i_ol)
         if len(ol) > 0:
             ol = pd.DataFrame(np.stack(ol, axis=0), columns=lab)
-            ol.to_csv(path.join('done',str(i)+"-"+ol['ProviderFirstName'][0]+'.csv'))
+            
+            ol.to_csv(path.join('done',str(i)+'.csv'))
         
     if len(errors) > 0:
         return 'errors'
