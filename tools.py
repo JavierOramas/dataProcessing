@@ -244,7 +244,7 @@ def process(fix=False):
         notifications.to_csv('auto_fixed.csv')
 
 
-    lab = list(cols)
+    lab = list(labels)
     lab.append('MeetingDuration')
     # print(overlappings)
     
@@ -261,7 +261,7 @@ def process(fix=False):
             ol.append(i_ol)
         if len(ol) > 0:
             ol = pd.DataFrame(np.stack(ol, axis=0), columns=lab)
-            ol = ol[labels]
+            ol = ol.drop(['ClientId'], axis=1)
             ol.to_csv(path.join('done',names[i]+' '+str(i)+'.csv'))
         
     if len(errors) > 0:
