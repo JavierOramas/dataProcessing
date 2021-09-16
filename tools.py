@@ -244,6 +244,7 @@ def process(fix=False):
 
     lab = list(cols)
     lab.append('MeetingDuration')
+    print(cols)
     # print(overlappings)
     
     if not os.path.exists('done'):
@@ -253,11 +254,13 @@ def process(fix=False):
         ol = []
         for j in overlappings[i]:
             d,i_ol,time = j[0]
+            if time == 0:
+                continue
             i_ol = np.append(i_ol,time.seconds/3600)
             ol.append(i_ol)
         if len(ol) > 0:
             ol = pd.DataFrame(np.stack(ol, axis=0), columns=lab)
-            ol.to_csv(path.join('done',str(i)+'.csv'))
+            ol.to_csv(path.join('done',str(i)+"-"+ol['ProviderFirstName'][0]+'.csv'))
         
     if len(errors) > 0:
         return 'errors'
