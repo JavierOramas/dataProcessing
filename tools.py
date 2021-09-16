@@ -262,7 +262,6 @@ def process(fix=False):
         if len(ol) > 0:
             ol = pd.DataFrame(np.stack(ol, axis=0), columns=lab)
             ol = ol[labels]
-            ol = ol.sort_values('DateOfService')
             ol.to_csv(path.join('done',names[i]+' '+str(i)+'.csv'))
         
     if len(errors) > 0:
