@@ -18,10 +18,10 @@ def get_providers():
     return pd.read_csv('providers.csv', sep=',')
 
 providers_data = get_providers()
+labels = ['TimeWorkedFrom', 'TimeWorkedTo','TimeWorkedInHours', 'ClientFirstName','ProviderId', 'ProviderFirstName', 'ProcedureCode','DateOfService', 'ClientId']
 
 def get_data():
     df = pd.read_csv('data.csv')
-    labels = ['ProviderId', 'DateOfService', 'TimeWorkedFrom', 'TimeWorkedTo', 'TimeWorkedInHours', 'ClientFirstName', 'ProviderFirstName', 'ProcedureCode', 'ClientId']
     return df.drop(df.columns.difference(labels), 1)
     
 def verify_valid_overlapping(entry, i, providerName, procedureCode, providerId):
@@ -101,7 +101,8 @@ def process(fix=False):
     notifications = []
     depured_data = []
     non_supervisors = []
-
+    names = {}
+    
     cols = data.columns
 
     providerId = list(cols).index('ProviderId')
@@ -119,6 +120,7 @@ def process(fix=False):
     supervisors_data = np.array(supervisors_data)
 
     for k in range(len(supervisors_data)):
+                
         i = supervisors_data[k]
         if i[procedureCode].replace(' ', '').lower() == 'remoteindividualsupervision':
             if i[providerId] in list(trainees['ProviderId']):
@@ -212,7 +214,9 @@ def process(fix=False):
     providers_data_with_errors = {}
         
     for i in non_supervisors:
-    
+        
+        names[i[providerId]] = i[providerName]
+        
         new_ol = calculate_overlapping(i, providerName=providerName, providerId=providerId, depured_data=depured_data, procedureCode=procedureCode, 
                                        client=client, timeFrom=timeFrom, timeTo=timeTo, risen_supervisors=risen_supervisors)
         
@@ -257,8 +261,9 @@ def process(fix=False):
             ol.append(i_ol)
         if len(ol) > 0:
             ol = pd.DataFrame(np.stack(ol, axis=0), columns=lab)
-            
-            ol.to_csv(path.join('done',str(i)+'.csv'))
+            ol = ol[labels]
+            ol = ol.sort_values('DateOfService')
+            ol.to_csv(path.join('done',names[i]+' '+str(i)+'.csv'))
         
     if len(errors) > 0:
         return 'errors'
