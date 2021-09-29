@@ -44,14 +44,26 @@ def verify_valid_overlapping(entry, i, providerName, procedureCode, providerId):
 def calculate_overlapping(entry, providerName,providerId,depured_data, procedureCode, client, timeFrom, timeTo, risen_supervisors):
     overlapping = []
     
-    entry_start = datetime.strptime(entry[timeFrom], '%m/%d/%Y %H:%M')
-    entry_end = datetime.strptime(entry[timeTo], '%m/%d/%Y %H:%M')
-    
+    try:
+        entry_start = datetime.strptime(entry[timeFrom], '%m/%d/%Y %H:%M')
+        entry_end = datetime.strptime(entry[timeTo], '%m/%d/%Y %H:%M')
+    except:
+        try:
+            entry_start = datetime.strptime(entry[timeFrom], '%m/%d/%Y %H:%M:%S')
+            entry_end = datetime.strptime(entry[timeTo], '%m/%d/%Y %H:%M:%S')
+        except:
+            pass
+        
     for i in depured_data:
         # print(verify_valid_overlapping(entry,i,providerName,procedureCode,providerId, risen_supervisors))
         if  verify_valid_overlapping(entry,i,providerName,procedureCode,providerId):
-            start = datetime.strptime(i[timeFrom], '%m/%d/%Y %H:%M')
-            end = datetime.strptime(i[timeTo], '%m/%d/%Y %H:%M')
+            try:
+                start = datetime.strptime(i[timeFrom], '%m/%d/%Y %H:%M')
+                end = datetime.strptime(i[timeTo], '%m/%d/%Y %H:%M')
+            except:
+                start = datetime.strptime(i[timeFrom], '%m/%d/%Y %H:%M:%S')
+                end = datetime.strptime(i[timeTo], '%m/%d/%Y %H:%M:%S')
+                
             if not i[client] == entry[client]:
                 continue
             
