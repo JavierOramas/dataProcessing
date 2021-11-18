@@ -37,7 +37,7 @@ def verify_valid_overlapping(entry, i, providerName, procedureCode, providerId):
         return True
     if procedure.lower().replace(' ', '') in ['97153', '97153:non-billable'] and i[procedureCode].lower().replace(' ', '') in ['97155', '97155:non-billable']:
         return True
-    if procedure.lower().replace(' ', '') == 'documentation' and i[procedureCode].lower().replace(' ', '') == 'remoteindividualsupervision':
+    if procedure.lower().replace(' ', '') == 'indirectservices' and i[procedureCode].lower().replace(' ', '') == 'remoteindividualsupervision':
         return True
     return False
 
@@ -99,7 +99,7 @@ def process(fix=False):
     RBTs = providers_data[providers_data['Status'] == 'RBT']
     data = get_data()
     
-    valid = ['97153', '97155', '97153: Non-Billable', '97155: Non-Billable', 'Documentation', 'Remote Individual Supervision']
+    valid = ['97153', '97155', '97153: Non-Billable', '97155: Non-Billable', 'Indirect Services', 'Remote Individual Supervision']
     supervisors_codes = ['97155', '97155:non-billable', 'remoteindividualsupervision']
     valid = [i.replace(' ','').lower() for i in valid]
     
@@ -137,12 +137,12 @@ def process(fix=False):
         if i[procedureCode].replace(' ', '').lower() == 'remoteindividualsupervision':
             if i[providerId] in list(trainees['ProviderId']):
                 notifications.append(i)
-                i[procedureCode] = 'Documentation'
+                i[procedureCode] = 'Indirect Services'
                 non_supervisors.append(i)
                 continue
             elif i[providerId] in list(RBTs['ProviderId']):
                 notifications.append(i)
-                i[procedureCode] = 'Documentation'
+                i[procedureCode] = 'Indirect Services'
                 non_supervisors.append(i)
                 continue
                 
@@ -171,11 +171,11 @@ def process(fix=False):
         depured_data.append(i)
 
     code53 = np.array(data[[i.lower().replace(' ', '') == '97153' for i in data['ProcedureCode']]])
-    code_doc = np.array(data[[i.lower().replace(' ', '') == 'documentation' for i in data['ProcedureCode']]])
+    code_doc = np.array(data[[i.lower().replace(' ', '') == 'indirectservices' for i in data['ProcedureCode']]])
     code55 = np.array(data[[i.lower().replace(' ', '') in ['97155', '97155:non-billable'] for i in data['ProcedureCode']]])
     
     for i in code_doc:
-        if i[procedureCode].replace(' ', '').lower() == 'documentation':
+        if i[procedureCode].replace(' ', '').lower() == 'Indirect Services':
 
             if i[providerId] in list(supervisors['ProviderId']):
                 notifications.append(i)

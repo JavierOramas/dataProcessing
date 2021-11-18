@@ -120,11 +120,6 @@ def get_all_file_paths():
 
 code = ''
 
-try:
-    shutil.rmtree('done/')
-    os.remove('files.zip')
-except:
-    pass
 
 st.title("Data Processor")
 st.write("""puede añadir un nuevo csv usando el componente siguiente, no obstante si ya el csv se encuentra cargado (de previas ejecuciones o agregado manualmente) puede directamente ejecutar el programa tocando el boton""")
@@ -137,6 +132,12 @@ if uploaded_file is not None:
         f.write(string_data)
 
 if st.button('Comenzar procesamiento'):
+    try:
+        shutil.rmtree('done/')
+        os.remove('files.zip')
+    except:
+        pass
+    
     code = process()
     # print(code)
 if code == 'errors':
