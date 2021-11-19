@@ -93,6 +93,7 @@ def process(fix=False):
 
     supervisors = providers_data[providers_data['Type'] == 'Supervisor']
     risen_supervisors = providers_data[providers_data['Type'] == 'Risen Supervisor']
+    print(risen_supervisors)
     trainees = providers_data[providers_data['Status'] == 'Trainee']
     RBTs = providers_data[providers_data['Status'] == 'RBT']
     data = get_data()
@@ -228,11 +229,12 @@ def process(fix=False):
 
     supervisors_meeting = []
     non_supervisors_meeting = []
+    
     for i in code_meeting:
         if not i[providerId] in overlappings:
             overlappings[i[providerId]] = []
-        
-        if i[providerId] in list(supervisors['ProviderId']+risen_supervisors['ProviderId']):
+            
+        if i[providerId] in supervisors['ProviderId'].tolist() or i[providerId] in risen_supervisors['ProviderId'].tolist():
             supervisors_meeting.append(i)
         else:
             non_supervisors_meeting.append(i)
