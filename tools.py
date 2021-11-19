@@ -108,7 +108,7 @@ def process(fix=False):
     data = data[data.Filter1]
     data = data.drop('Filter1', 1)
 
-    st.dataframe(data)
+    # st.dataframe(data)
 
     errors = []
     notifications = []
@@ -247,6 +247,8 @@ def process(fix=False):
                 flag = True
                 break
         if not flag:
+            temp = i
+            temp[providerName] = ''
             overlappings[i[providerId]].append(('',i, datetime.strptime(i[timeTo], '%m/%d/%Y %H:%M')-datetime.strptime(i[DateTimeFrom], '%m/%d/%Y %H:%M')))
     
     for i in non_supervisors:
