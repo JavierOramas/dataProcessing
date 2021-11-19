@@ -4,3 +4,5 @@ supervisors_data.csv
 data.csv
 errors.csv
 files.zip
+__pycache__/tools.cpython-37.pyc
+.~lock.data.csv#
